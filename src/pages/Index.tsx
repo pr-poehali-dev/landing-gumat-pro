@@ -16,6 +16,34 @@ const Index = () => {
     email: ''
   });
 
+  const [calcData, setCalcData] = useState({
+    area: 100,
+    npkCost: 25000,
+    npkReduction: 15,
+    yieldIncrease: 3.2,
+    grainPrice: 12000
+  });
+
+  const calculateSavings = () => {
+    const npkSavings = (calcData.area * calcData.npkCost * calcData.npkReduction) / 100;
+    const yieldRevenue = calcData.area * calcData.yieldIncrease * calcData.grainPrice;
+    const totalBenefit = npkSavings + yieldRevenue;
+    const humatCost = calcData.area * 800;
+    const netProfit = totalBenefit - humatCost;
+    const roi = ((netProfit / humatCost) * 100).toFixed(0);
+    
+    return {
+      npkSavings: Math.round(npkSavings),
+      yieldRevenue: Math.round(yieldRevenue),
+      totalBenefit: Math.round(totalBenefit),
+      humatCost: Math.round(humatCost),
+      netProfit: Math.round(netProfit),
+      roi
+    };
+  };
+
+  const results = calculateSavings();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
@@ -325,6 +353,174 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Calculator Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 text-primary">
+                Калькулятор экономии
+              </h2>
+              <p className="text-xl text-muted-foreground">
+                Рассчитайте выгоду для вашего хозяйства прямо сейчас
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <Card className="border-2">
+                <CardContent className="p-8">
+                  <h3 className="text-2xl font-bold mb-6 text-primary">Исходные данные</h3>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">
+                        Площадь посева, га
+                      </label>
+                      <Input
+                        type="number"
+                        value={calcData.area}
+                        onChange={(e) => setCalcData({...calcData, area: Number(e.target.value)})}
+                        className="text-lg"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">
+                        Затраты на NPK, ₽/га
+                      </label>
+                      <Input
+                        type="number"
+                        value={calcData.npkCost}
+                        onChange={(e) => setCalcData({...calcData, npkCost: Number(e.target.value)})}
+                        className="text-lg"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">
+                        Снижение нормы NPK, %
+                      </label>
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="range"
+                          min="5"
+                          max="25"
+                          value={calcData.npkReduction}
+                          onChange={(e) => setCalcData({...calcData, npkReduction: Number(e.target.value)})}
+                          className="flex-1 h-2 bg-primary/20 rounded-lg appearance-none cursor-pointer"
+                          style={{
+                            background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${(calcData.npkReduction - 5) / 20 * 100}%, hsl(var(--primary) / 0.2) ${(calcData.npkReduction - 5) / 20 * 100}%, hsl(var(--primary) / 0.2) 100%)`
+                          }}
+                        />
+                        <span className="text-2xl font-bold text-primary w-16 text-right">{calcData.npkReduction}%</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">
+                        Прирост урожайности, ц/га
+                      </label>
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="range"
+                          min="1"
+                          max="5"
+                          step="0.1"
+                          value={calcData.yieldIncrease}
+                          onChange={(e) => setCalcData({...calcData, yieldIncrease: Number(e.target.value)})}
+                          className="flex-1 h-2 bg-primary/20 rounded-lg appearance-none cursor-pointer"
+                          style={{
+                            background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${(calcData.yieldIncrease - 1) / 4 * 100}%, hsl(var(--primary) / 0.2) ${(calcData.yieldIncrease - 1) / 4 * 100}%, hsl(var(--primary) / 0.2) 100%)`
+                          }}
+                        />
+                        <span className="text-2xl font-bold text-primary w-16 text-right">{calcData.yieldIncrease}</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">
+                        Цена зерна, ₽/ц
+                      </label>
+                      <Input
+                        type="number"
+                        value={calcData.grainPrice}
+                        onChange={(e) => setCalcData({...calcData, grainPrice: Number(e.target.value)})}
+                        className="text-lg"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 bg-gradient-to-br from-primary/5 to-primary/10">
+                <CardContent className="p-8">
+                  <h3 className="text-2xl font-bold mb-6 text-primary">Ваша выгода</h3>
+                  
+                  <div className="space-y-6">
+                    <div className="bg-white rounded-lg p-4 border-2 border-green-200">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Icon name="DollarSign" className="text-green-600" size={24} />
+                        <span className="text-sm font-medium text-muted-foreground">Экономия на NPK</span>
+                      </div>
+                      <p className="text-3xl font-bold text-green-600">
+                        {results.npkSavings.toLocaleString()} ₽
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4 border-2 border-blue-200">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Icon name="TrendingUp" className="text-blue-600" size={24} />
+                        <span className="text-sm font-medium text-muted-foreground">Доход от прироста урожая</span>
+                      </div>
+                      <p className="text-3xl font-bold text-blue-600">
+                        {results.yieldRevenue.toLocaleString()} ₽
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4 border-2 border-orange-200">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Icon name="Minus" className="text-orange-600" size={24} />
+                        <span className="text-sm font-medium text-muted-foreground">Затраты на Полевой гумат PRO</span>
+                      </div>
+                      <p className="text-3xl font-bold text-orange-600">
+                        {results.humatCost.toLocaleString()} ₽
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">~800 ₽/га</p>
+                    </div>
+
+                    <div className="bg-primary text-white rounded-lg p-6 shadow-lg">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Icon name="Award" className="text-white" size={28} />
+                        <span className="text-sm font-medium opacity-90">Чистая прибыль</span>
+                      </div>
+                      <p className="text-4xl font-bold mb-2">
+                        {results.netProfit.toLocaleString()} ₽
+                      </p>
+                      <div className="flex items-center gap-2 text-sm opacity-90">
+                        <Icon name="Percent" size={16} />
+                        <span>ROI: {results.roi}%</span>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground text-center italic">
+                      * Расчет основан на средних показателях полевых испытаний. Точные цифры зависят от ваших условий.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="text-center mt-8">
+              <Button size="lg" className="text-lg px-8" onClick={() => {
+                document.getElementById('final-cta')?.scrollIntoView({ behavior: 'smooth' });
+              }}>
+                Получить персональный расчет
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
@@ -395,7 +591,7 @@ const Index = () => {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-primary to-primary/80 text-white">
+      <section id="final-cta" className="py-20 bg-gradient-to-br from-primary to-primary/80 text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
